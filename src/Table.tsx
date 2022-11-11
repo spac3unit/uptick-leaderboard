@@ -14,21 +14,28 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 
 import '@fontsource/jetbrains-mono';
+import { table } from 'console';
 
 function createData(valoperAddr: string, tokensAmount: any) {
   return { valoperAddr, tokensAmount };
 }
 
+function uniqArray(arrArg: any) {
+  return arrArg.filter((elem: any, pos: any, arr: any) => {
+    return arr.indexOf(elem) == pos;
+  });
+}
 // let baseurl = 'http://62.141.38.231:1317';
 
 export function LeaderboardTable() {
-  const [data, setData] = useState();
+  const [data, setData] = useState([]);
   const [tableRows, setTableRows] = useState<any>([]);
   const [delegatorAddress, setDelegatorAddress] = useState('uptick1ncn0k65x3esuzxztzymd0s0kwhun7wxnrcc9mw');
   let baseurl = 'https://uptick-leaderboard.duckdns.org';
   // let baseurl = 'https://peer1.testnet.uptick.network:1318';
 
   const handleDelegatorAddressChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setTableRows([]);
     setDelegatorAddress(event.target.value);
   };
 
@@ -55,10 +62,10 @@ export function LeaderboardTable() {
         🏆 Game of Uptick Testnet Leaderboard 🏆
       </Typography>
 
-      <Typography variant="body1" gutterBottom>
+      {/* <Typography variant="body1" gutterBottom>
         Delegator address: uptick1ncn0k65x3esuzxztzymd0s0kwhun7wxnrcc9mw
-      </Typography>
-      {/*       
+      </Typography> */}
+
       <Box
         component="div"
         sx={{
@@ -74,9 +81,9 @@ export function LeaderboardTable() {
           variant="standard"
           spellCheck={false}
         />
-      </Box> */}
+      </Box>
 
-      {data && (
+      {tableRows && (
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
