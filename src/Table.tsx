@@ -13,20 +13,21 @@ function createData(valoperAddr: string, tokensAmount: any) {
   return { valoperAddr, tokensAmount };
 }
 
-const rows = [
-  createData('valoper1', 98010000),
-  createData('valoper2', 68010000),
-  createData('valoper3', 48010000),
-  createData('valoper4', 78010000),
-  createData('valoper5', 18010000),
-];
-console.log('rows:', rows);
+// const rows = [
+//   createData('valoper1', 98010000),
+//   createData('valoper2', 68010000),
+//   createData('valoper3', 48010000),
+//   createData('valoper4', 78010000),
+//   createData('valoper5', 18010000),
+// ];
+// console.log('rows:', rows);
 
 export function LeaderboardTable() {
   const [data, setData] = useState();
   const [tableRows, setTableRows] = useState<any>([]);
 
   let baseurl = 'https://uptick-leaderboard.duckdns.org';
+  // let baseurl = 'http://62.141.38.231:1317';
   let delegatorAddr = 'uptick1ncn0k65x3esuzxztzymd0s0kwhun7wxnrcc9mw';
 
   useEffect(() => {
@@ -42,7 +43,7 @@ export function LeaderboardTable() {
           ]);
         });
 
-        // console.log(delegationsData.delegation_responses);
+        console.log(delegationsData.delegation_responses);
       });
   }, []);
 
@@ -53,6 +54,7 @@ export function LeaderboardTable() {
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
               <TableRow>
+                <TableCell>Rank</TableCell>
                 <TableCell>Valoper address</TableCell>
                 <TableCell>Tokens amount</TableCell>
               </TableRow>
@@ -62,11 +64,12 @@ export function LeaderboardTable() {
                 .sort((a: any, b: any) => {
                   return b.tokensAmount - a.tokensAmount;
                 })
-                .map((row: any) => (
+                .map((row: any, idx: any) => (
                   <TableRow
                     key={row.valoperAddr}
                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                   >
+                    <TableCell>#{idx} </TableCell>
                     <TableCell component="th" scope="row">
                       {row.valoperAddr}
                     </TableCell>
