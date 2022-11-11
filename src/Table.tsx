@@ -69,7 +69,7 @@ export function LeaderboardTable() {
                     key={row.valoperAddr}
                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                   >
-                    <TableCell>#{idx} </TableCell>
+                    <TableCell>#{idx + 1} </TableCell>
                     <TableCell component="th" scope="row">
                       {row.valoperAddr}
                     </TableCell>
