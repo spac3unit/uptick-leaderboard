@@ -155,7 +155,7 @@ export function LeaderboardTableWithMoniker() {
                       {row.operatorAddress}
                     </TableCell>
                     <TableCell align="right">
-                      {BigInt(row.tokensAmount).toLocaleString()} uptick
+                      {BigInt(row.tokensAmount).toLocaleString()} auptick
                       {/* {row.tokensAmount.toString().substring(0, row.tokensAmount.toString().indexOf('.') + 7)} uptick */}
                     </TableCell>
                   </TableRow>
