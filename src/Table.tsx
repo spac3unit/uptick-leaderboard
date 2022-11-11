@@ -25,8 +25,8 @@ export function LeaderboardTable() {
   const [delegatorAddress, setDelegatorAddress] = useState('uptick1ncn0k65x3esuzxztzymd0s0kwhun7wxnrcc9mw');
   const [validatorAddress, setValidatorAddress] = useState('');
 
-  // let baseurl = 'https://uptick-leaderboard.duckdns.org';
-  let baseurl = 'https://peer1.testnet.uptick.network:1318';
+  let baseurl = 'https://uptick-leaderboard.duckdns.org';
+  // let baseurl = 'https://peer1.testnet.uptick.network:1318';
 
   const handleDelegatorAddressChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTableRows([]);
