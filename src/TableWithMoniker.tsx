@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Decimal } from '@cosmjs/math';
+import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -13,13 +14,33 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import '@fontsource/jetbrains-mono';
 
-function createData(rank: any, valoperAddr: string, tokensAmount: any) {
-  return { rank, valoperAddr, tokensAmount };
+function createData(rank: any, avatar: any, moniker: string, operatorAddress: any, tokensAmount: any) {
+  return { rank, avatar, moniker, operatorAddress, tokensAmount };
+}
+
+function convertExponent(n: any) {
+  var sign = +n < 0 ? '-' : '',
+    toStr = n.toString();
+  if (!/e/i.test(toStr)) {
+    return n;
+  }
+  var [lead, decimal, pow] = n
+    .toString()
+    .replace(/^-/, '')
+    .replace(/^([0-9]+)(e.*)/, '$1.$2')
+    .split(/e|\./);
+  return +pow < 0
+    ? sign + '0.' + '0'.repeat(Math.max(Math.abs(pow) - 1 || 0, 0)) + lead + decimal
+    : sign +
+        lead +
+        (+pow >= decimal.length
+          ? decimal + '0'.repeat(Math.max(+pow - decimal.length || 0, 0))
+          : decimal.slice(0, +pow) + '.' + decimal.slice(+pow));
 }
 
 // let baseurl = 'http://62.141.38.231:1317';
 
-export function LeaderboardTable() {
+export function LeaderboardTableWithMoniker() {
   const [data, setData] = useState([]);
   const [tableRows, setTableRows] = useState<any>([]);
   const [delegatorAddress, setDelegatorAddress] = useState('uptick1ncn0k65x3esuzxztzymd0s0kwhun7wxnrcc9mw');
@@ -37,27 +58,59 @@ export function LeaderboardTable() {
     setValidatorAddress(event.target.value);
   };
 
+  // useEffect(() => {
+  //   fetch(`${baseurl}/cosmos/staking/v1beta1/delegations/${delegatorAddress}?pagination.limit=250`)
+  //     .then((response) => response.json())
+  //     .then((delegationsData) => {
+  //       setData(delegationsData.delegation_responses);
+
+  //       delegationsData.delegation_responses
+  // .sort((a: any, b: any) => {
+  //   return b.delegation.shares - a.delegation.shares;
+  // })
+  //         .map((item: any, idx: any) => {
+  //           const rank = idx + 1;
+  // setTableRows((current: any) => [
+  //   ...current,
+  //   createData(rank, item.delegation.validator_address, item.delegation.shares),
+  // ]);
+  //         });
+
+  //       // console.log(delegationsData.delegation_responses);
+  //     });
+  // }, [delegatorAddress]);
+
   useEffect(() => {
-    fetch(`${baseurl}/cosmos/staking/v1beta1/delegations/${delegatorAddress}?pagination.limit=250`)
+    fetch(`https://uptick.api.explorers.guru/api/v1/accounts/uptick1ncn0k65x3esuzxztzymd0s0kwhun7wxnrcc9mw/delegations`)
       .then((response) => response.json())
       .then((delegationsData) => {
-        setData(delegationsData.delegation_responses);
+        let newArr: any = [];
+        delegationsData.map((item: any) => {
+          newArr.push({
+            moniker: item.validator.moniker,
+            operatorAddress: item.validator.operatorAddress,
+            avatar: item.validator.avatar,
+            status: item.status,
+            tokensAmount: Math.round(item.tokens.amount),
+            // tokensAmount: item.tokens.amount.toString().substring(0, item.tokens.amount.toString().indexOf('.') + 3),
+          });
+        });
 
-        delegationsData.delegation_responses
+        newArr
           .sort((a: any, b: any) => {
-            return b.delegation.shares - a.delegation.shares;
+            return b.tokensAmount - a.tokensAmount;
           })
           .map((item: any, idx: any) => {
             const rank = idx + 1;
             setTableRows((current: any) => [
               ...current,
-              createData(rank, item.delegation.validator_address, item.delegation.shares),
+              createData(rank, item.avatar, item.moniker, item.operatorAddress, item.tokensAmount),
             ]);
           });
 
-        console.log(delegationsData.delegation_responses);
+        console.log(newArr);
       });
-  }, [delegatorAddress]);
+  }, []);
 
   return (
     <Container>
@@ -98,23 +151,31 @@ export function LeaderboardTable() {
             <TableHead>
               <TableRow>
                 <TableCell>Rank</TableCell>
+                <TableCell>Moniker</TableCell>
                 <TableCell>Valoper address</TableCell>
                 <TableCell align="right">Tokens amount</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {tableRows
-                .filter((item: any) => item.valoperAddr.includes(validatorAddress))
+                .filter(
+                  (item: any) =>
+                    item.moniker.includes(validatorAddress) || item.operatorAddress.includes(validatorAddress)
+                )
                 .map((row: any) => (
-                  <TableRow key={row.valoperAddr} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                  <TableRow key={row.moniker} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                     <TableCell>#{row.rank}</TableCell>
                     <TableCell component="th" scope="row">
-                      {row.valoperAddr}
+                      <Box component="div" sx={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <Avatar sx={{ width: 28, height: 28 }} src={row.avatar} /> {row.moniker}
+                      </Box>
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {row.operatorAddress}
                     </TableCell>
                     <TableCell align="right">
-                      {Math.trunc(row.tokensAmount)} auptick
-                      {/* {Math.floor(row.tokensAmount * 100) / 100} auptick */}
-                      {/* {row.tokensAmount.toString().substring(0, row.tokensAmount.toString().indexOf('.') + 3)} auptick */}
+                      {BigInt(row.tokensAmount).toLocaleString()} uptick
+                      {/* {row.tokensAmount.toString().substring(0, row.tokensAmount.toString().indexOf('.') + 7)} uptick */}
                     </TableCell>
                   </TableRow>
                 ))}

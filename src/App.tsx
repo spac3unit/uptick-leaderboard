@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { LeaderboardTable } from './Table';
+import { LeaderboardTableWithMoniker } from './TableWithMoniker';
 // http://62.141.38.231:1317/swagger/
 // https://peer1.testnet.uptick.network:1318;
 import { createTheme, responsiveFontSizes, ThemeProvider } from '@mui/material/styles';
@@ -29,7 +30,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <div className="App">
-        <LeaderboardTable />
+        <LeaderboardTableWithMoniker />
       </div>
     </ThemeProvider>
   );
