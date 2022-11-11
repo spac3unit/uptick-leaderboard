@@ -1,6 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@cosmjs/math': ^0.29.3
   '@emotion/react': ^11.10.5
   '@emotion/styled': ^11.10.5
   '@fontsource/jetbrains-mono': ^4.5.11
@@ -19,6 +20,7 @@ specifiers:
   web-vitals: ^2.1.4
 
 dependencies:
+  '@cosmjs/math': 0.29.3
   '@emotion/react': 11.10.5_fan5qbzahqtxlm5dzefqlqx5ia
   '@emotion/styled': 11.10.5_otcjdfkheatawhug6fwk7ldzni
   '@fontsource/jetbrains-mono': 4.5.11
@@ -1432,6 +1434,12 @@ packages:
 
   /@bcoe/v8-coverage/0.2.3:
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
+    dev: false
+
+  /@cosmjs/math/0.29.3:
+    resolution: {integrity: sha512-4HGHqS+Yn81dZLOAYcDSQbROBD1a7ETW3ur5hziCTXMjZFILRJ3w71PlFUVppVb2u3kRDBBXuYHvZ6/V0M0nrg==}
+    dependencies:
+      bn.js: 5.2.1
     dev: false
 
   /@csstools/normalize.css/12.0.0:
@@ -3583,6 +3591,10 @@ packages:
 
   /bluebird/3.7.2:
     resolution: {integrity: sha512-XpNj6GDQzdfW+r2Wnn7xiSAd7TM3jzkxGXBGTtWKuSXv1xUV+azxAm8jdWZN06QTQk+2N2XB9jRDkvbmQmcRtg==}
+    dev: false
+
+  /bn.js/5.2.1:
+    resolution: {integrity: sha512-eXRvHzWyYPBuB4NBy0cmYQjGitUrtqwbvlzP3G6VFnNRbsZQIxQ10PbKKHt8gZ/HW/D/747aDl+QkDqg3KQLMQ==}
     dev: false
 
   /body-parser/1.20.1:

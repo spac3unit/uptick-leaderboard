@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { Decimal } from '@cosmjs/math';
+
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -53,6 +55,10 @@ export function LeaderboardTable() {
         🏆 Game of Uptick Testnet Leaderboard 🏆
       </Typography>
 
+      <Typography variant="body1" gutterBottom>
+        Delegator address: uptick1ncn0k65x3esuzxztzymd0s0kwhun7wxnrcc9mw
+      </Typography>
+      {/*       
       <Box
         component="div"
         sx={{
@@ -68,7 +74,7 @@ export function LeaderboardTable() {
           variant="standard"
           spellCheck={false}
         />
-      </Box>
+      </Box> */}
 
       {data && (
         <TableContainer component={Paper}>
