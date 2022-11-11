@@ -92,7 +92,7 @@ export function LeaderboardTableWithMoniker() {
   }, []);
 
   return (
-    <Container>
+    <Container sx={{ maxWidth: '1240px !important' }}>
       <Typography variant="h4" align="center" sx={{ m: '18px 0 38px 0' }}>
         🏆 Game of Uptick Testnet Leaderboard 🏆
       </Typography>
