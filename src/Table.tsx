@@ -7,7 +7,9 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Container from '@mui/material/Container';
-import { render } from 'react-dom';
+
+import Typography from '@mui/material/Typography';
+import '@fontsource/jetbrains-mono';
 
 function createData(valoperAddr: string, tokensAmount: any) {
   return { valoperAddr, tokensAmount };
@@ -26,8 +28,9 @@ export function LeaderboardTable() {
   const [data, setData] = useState();
   const [tableRows, setTableRows] = useState<any>([]);
 
-  let baseurl = 'https://uptick-leaderboard.duckdns.org';
+  // let baseurl = 'https://uptick-leaderboard.duckdns.org';
   // let baseurl = 'http://62.141.38.231:1317';
+  let baseurl = 'https://peer1.testnet.uptick.network:1318';
   let delegatorAddr = 'uptick1ncn0k65x3esuzxztzymd0s0kwhun7wxnrcc9mw';
 
   useEffect(() => {
@@ -49,6 +52,10 @@ export function LeaderboardTable() {
 
   return (
     <Container>
+      <h1 style={{ marginBottom: '38px', textAlign: 'center' }}>
+        Game of Uptick Testnet Leaderboard
+      </h1>
+      <p>Delegator address: uptick1ncn0k65x3esuzxztzymd0s0kwhun7wxnrcc9mw</p>
       {data && (
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
