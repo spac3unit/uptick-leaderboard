@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -8,32 +9,29 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
+
 import '@fontsource/jetbrains-mono';
 
 function createData(valoperAddr: string, tokensAmount: any) {
   return { valoperAddr, tokensAmount };
 }
 
-// const rows = [
-//   createData('valoper1', 98010000),
-//   createData('valoper2', 68010000),
-//   createData('valoper3', 48010000),
-//   createData('valoper4', 78010000),
-//   createData('valoper5', 18010000),
-// ];
-// console.log('rows:', rows);
+// let baseurl = 'http://62.141.38.231:1317';
 
 export function LeaderboardTable() {
   const [data, setData] = useState();
   const [tableRows, setTableRows] = useState<any>([]);
-
+  const [delegatorAddress, setDelegatorAddress] = useState('uptick1ncn0k65x3esuzxztzymd0s0kwhun7wxnrcc9mw');
   let baseurl = 'https://uptick-leaderboard.duckdns.org';
-  // let baseurl = 'http://62.141.38.231:1317';
   // let baseurl = 'https://peer1.testnet.uptick.network:1318';
-  let delegatorAddr = 'uptick1ncn0k65x3esuzxztzymd0s0kwhun7wxnrcc9mw';
+
+  const handleDelegatorAddressChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setDelegatorAddress(event.target.value);
+  };
 
   useEffect(() => {
-    fetch(`${baseurl}/cosmos/staking/v1beta1/delegations/${delegatorAddr}`)
+    fetch(`${baseurl}/cosmos/staking/v1beta1/delegations/${delegatorAddress}`)
       .then((response) => response.json())
       .then((delegationsData) => {
         setData(delegationsData.delegation_responses);
@@ -47,7 +45,7 @@ export function LeaderboardTable() {
 
         console.log(delegationsData.delegation_responses);
       });
-  }, []);
+  }, [delegatorAddress]);
 
   return (
     <Container>
@@ -55,9 +53,22 @@ export function LeaderboardTable() {
         🏆 Game of Uptick Testnet Leaderboard 🏆
       </Typography>
 
-      <Typography variant="body1" gutterBottom>
-        Delegator address: uptick1ncn0k65x3esuzxztzymd0s0kwhun7wxnrcc9mw
-      </Typography>
+      <Box
+        component="div"
+        sx={{
+          maxWidth: '500px',
+          mb: '22px',
+        }}
+      >
+        <TextField
+          value={delegatorAddress}
+          onChange={handleDelegatorAddressChange}
+          label="Delegator address"
+          fullWidth
+          variant="standard"
+          spellCheck={false}
+        />
+      </Box>
 
       {data && (
         <TableContainer component={Paper}>
@@ -75,10 +86,7 @@ export function LeaderboardTable() {
                   return b.tokensAmount - a.tokensAmount;
                 })
                 .map((row: any, idx: any) => (
-                  <TableRow
-                    key={row.valoperAddr}
-                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                  >
+                  <TableRow key={row.valoperAddr} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                     <TableCell>#{idx + 1} </TableCell>
                     <TableCell component="th" scope="row">
                       {row.valoperAddr}
