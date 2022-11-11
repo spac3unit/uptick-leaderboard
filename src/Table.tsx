@@ -26,7 +26,7 @@ export function LeaderboardTable() {
   const [data, setData] = useState();
   const [tableRows, setTableRows] = useState<any>([]);
 
-  let baseurl = 'https://peer1.testnet.uptick.network:1318';
+  let baseurl = 'https://uptick-leaderboard.duckdns.org/';
   let delegatorAddr = 'uptick1ncn0k65x3esuzxztzymd0s0kwhun7wxnrcc9mw';
 
   useEffect(() => {
@@ -70,7 +70,7 @@ export function LeaderboardTable() {
                     <TableCell component="th" scope="row">
                       {row.valoperAddr}
                     </TableCell>
-                    <TableCell>{row.tokensAmount} UPTICK</TableCell>
+                    <TableCell>{row.tokensAmount} auptick</TableCell>
                   </TableRow>
                 ))}
             </TableBody>
