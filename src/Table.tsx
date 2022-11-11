@@ -7,7 +7,6 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Container from '@mui/material/Container';
-
 import Typography from '@mui/material/Typography';
 import '@fontsource/jetbrains-mono';
 
@@ -52,10 +51,14 @@ export function LeaderboardTable() {
 
   return (
     <Container>
-      <h1 style={{ marginBottom: '38px', textAlign: 'center' }}>
-        Game of Uptick Testnet Leaderboard
-      </h1>
-      <p>Delegator address: uptick1ncn0k65x3esuzxztzymd0s0kwhun7wxnrcc9mw</p>
+      <Typography variant="h4" align="center" sx={{ m: '18px 0 38px 0' }}>
+        🏆 Game of Uptick Testnet Leaderboard 🏆
+      </Typography>
+
+      <Typography variant="body1" gutterBottom>
+        Delegator address: uptick1ncn0k65x3esuzxztzymd0s0kwhun7wxnrcc9mw
+      </Typography>
+
       {data && (
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
