@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Decimal } from '@cosmjs/math';
-
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -12,45 +11,50 @@ import Paper from '@mui/material/Paper';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
-
 import '@fontsource/jetbrains-mono';
-import { table } from 'console';
 
-function createData(valoperAddr: string, tokensAmount: any) {
-  return { valoperAddr, tokensAmount };
+function createData(rank: any, valoperAddr: string, tokensAmount: any) {
+  return { rank, valoperAddr, tokensAmount };
 }
 
-function uniqArray(arrArg: any) {
-  return arrArg.filter((elem: any, pos: any, arr: any) => {
-    return arr.indexOf(elem) == pos;
-  });
-}
 // let baseurl = 'http://62.141.38.231:1317';
 
 export function LeaderboardTable() {
   const [data, setData] = useState([]);
   const [tableRows, setTableRows] = useState<any>([]);
   const [delegatorAddress, setDelegatorAddress] = useState('uptick1ncn0k65x3esuzxztzymd0s0kwhun7wxnrcc9mw');
-  let baseurl = 'https://uptick-leaderboard.duckdns.org';
-  // let baseurl = 'https://peer1.testnet.uptick.network:1318';
+  const [validatorAddress, setValidatorAddress] = useState('');
+
+  // let baseurl = 'https://uptick-leaderboard.duckdns.org';
+  let baseurl = 'https://peer1.testnet.uptick.network:1318';
 
   const handleDelegatorAddressChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTableRows([]);
     setDelegatorAddress(event.target.value);
   };
 
+  const handleValidatorAddressChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setValidatorAddress(event.target.value);
+    // let newState = tableRows.filter((item: any) => item.valoperAddr == validatorAddress);
+    // setTableRows(newState);
+  };
+
   useEffect(() => {
-    fetch(`${baseurl}/cosmos/staking/v1beta1/delegations/${delegatorAddress}`)
+    fetch(`${baseurl}/cosmos/staking/v1beta1/delegations/${delegatorAddress}?pagination.limit=250`)
       .then((response) => response.json())
       .then((delegationsData) => {
         setData(delegationsData.delegation_responses);
 
-        delegationsData.delegation_responses.map((item: any) => {
-          setTableRows((current: any) => [
-            ...current,
-            createData(item.delegation.validator_address, item.delegation.shares),
-          ]);
-        });
+        delegationsData.delegation_responses
+          .sort((a: any, b: any) => {
+            return b.delegation.shares - a.delegation.shares;
+          })
+          .map((item: any, idx: any) => {
+            setTableRows((current: any) => [
+              ...current,
+              createData(idx + 1, item.delegation.validator_address, item.delegation.shares),
+            ]);
+          });
 
         console.log(delegationsData.delegation_responses);
       });
@@ -62,17 +66,23 @@ export function LeaderboardTable() {
         🏆 Game of Uptick Testnet Leaderboard 🏆
       </Typography>
 
-      {/* <Typography variant="body1" gutterBottom>
-        Delegator address: uptick1ncn0k65x3esuzxztzymd0s0kwhun7wxnrcc9mw
-      </Typography> */}
-
       <Box
         component="div"
         sx={{
-          maxWidth: '500px',
+          display: 'flex',
+          gap: '24px',
           mb: '22px',
         }}
       >
+        <TextField
+          value={validatorAddress}
+          onChange={handleValidatorAddressChange}
+          label="Search validator address"
+          fullWidth
+          variant="standard"
+          spellCheck={false}
+        />
+
         <TextField
           value={delegatorAddress}
           onChange={handleDelegatorAddressChange}
@@ -95,12 +105,10 @@ export function LeaderboardTable() {
             </TableHead>
             <TableBody>
               {tableRows
-                .sort((a: any, b: any) => {
-                  return b.tokensAmount - a.tokensAmount;
-                })
+                .filter((item: any) => item.valoperAddr.includes(validatorAddress))
                 .map((row: any, idx: any) => (
                   <TableRow key={row.valoperAddr} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                    <TableCell>#{idx + 1} </TableCell>
+                    <TableCell>#{row.rank} </TableCell>
                     <TableCell component="th" scope="row">
                       {row.valoperAddr}
                     </TableCell>
