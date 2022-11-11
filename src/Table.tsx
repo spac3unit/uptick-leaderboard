@@ -28,9 +28,9 @@ export function LeaderboardTable() {
   const [data, setData] = useState();
   const [tableRows, setTableRows] = useState<any>([]);
 
-  // let baseurl = 'https://uptick-leaderboard.duckdns.org';
+  let baseurl = 'https://uptick-leaderboard.duckdns.org';
   // let baseurl = 'http://62.141.38.231:1317';
-  let baseurl = 'https://peer1.testnet.uptick.network:1318';
+  // let baseurl = 'https://peer1.testnet.uptick.network:1318';
   let delegatorAddr = 'uptick1ncn0k65x3esuzxztzymd0s0kwhun7wxnrcc9mw';
 
   useEffect(() => {
