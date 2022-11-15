@@ -16,47 +16,60 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import '@fontsource/jetbrains-mono';
 
-function createData(rank: any, avatar: any, moniker: string, operatorAddress: any, tokensAmount: any) {
+function createData(rank, avatar, moniker, operatorAddress, tokensAmount) {
   return { rank, avatar, moniker, operatorAddress, tokensAmount };
 }
 
-function convertExponent(n: any) {
-  var sign = +n < 0 ? '-' : '',
-    toStr = n.toString();
-  if (!/e/i.test(toStr)) {
-    return n;
+function scientificToDecimal(num) {
+  var nsign = Math.sign(num);
+  //remove the sign
+  num = Math.abs(num);
+  //if the number is in scientific notation remove it
+  if (/\d+\.?\d*e[\+\-]*\d+/i.test(num)) {
+    var zero = '0',
+      parts = String(num).toLowerCase().split('e'), //split into coeff and exponent
+      e = parts.pop(), //store the exponential part
+      l = Math.abs(e), //get the number of zeros
+      sign = e / l,
+      coeff_array = parts[0].split('.');
+    if (sign === -1) {
+      l = l - coeff_array[0].length;
+      if (l < 0) {
+        num =
+          coeff_array[0].slice(0, l) + '.' + coeff_array[0].slice(l) + (coeff_array.length === 2 ? coeff_array[1] : '');
+      } else {
+        num = zero + '.' + new Array(l + 1).join(zero) + coeff_array.join('');
+      }
+    } else {
+      var dec = coeff_array[1];
+      if (dec) l = l - dec.length;
+      if (l < 0) {
+        num = coeff_array[0] + dec.slice(0, l) + '.' + dec.slice(l);
+      } else {
+        num = coeff_array.join('') + new Array(l + 1).join(zero);
+      }
+    }
   }
-  var [lead, decimal, pow] = n
-    .toString()
-    .replace(/^-/, '')
-    .replace(/^([0-9]+)(e.*)/, '$1.$2')
-    .split(/e|\./);
-  return +pow < 0
-    ? sign + '0.' + '0'.repeat(Math.max(Math.abs(pow) - 1 || 0, 0)) + lead + decimal
-    : sign +
-        lead +
-        (+pow >= decimal.length
-          ? decimal + '0'.repeat(Math.max(+pow - decimal.length || 0, 0))
-          : decimal.slice(0, +pow) + '.' + decimal.slice(+pow));
-}
 
+  return nsign < 0 ? '-' + num : num;
+}
 // let baseurl = 'http://62.141.38.231:1317';
 
 export function LeaderboardTableWithMoniker() {
   const [data, setData] = useState([]);
-  const [tableRows, setTableRows] = useState<any>([]);
+  const [tableRows, setTableRows] = useState([]);
   const [delegatorAddress, setDelegatorAddress] = useState('uptick1ncn0k65x3esuzxztzymd0s0kwhun7wxnrcc9mw');
   const [validatorAddress, setValidatorAddress] = useState('');
 
   // let baseurl = 'https://uptick-leaderboard.duckdns.org';
   let baseurl = 'https://peer1.testnet.uptick.network:1318';
 
-  const handleDelegatorAddressChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDelegatorAddressChange = (event) => {
     setTableRows([]);
     setDelegatorAddress(event.target.value);
   };
 
-  const handleValidatorAddressChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleValidatorAddressChange = (event) => {
     setValidatorAddress(event.target.value);
   };
 
@@ -64,24 +77,26 @@ export function LeaderboardTableWithMoniker() {
     fetch(`https://uptick.api.explorers.guru/api/v1/accounts/${delegatorAddress}/delegations`)
       .then((response) => response.json())
       .then((delegationsData) => {
-        let newArr: any = [];
-        delegationsData.map((item: any) => {
+        let newArr = [];
+        delegationsData.map((item) => {
           newArr.push({
             moniker: item.validator.moniker,
             operatorAddress: item.validator.operatorAddress,
             avatar: item.validator.avatar,
             status: item.status,
-            tokensAmount: Math.round(item.tokens.amount),
+            tokensAmount: Decimal.fromAtomics(scientificToDecimal(item.tokens.amount).toString(), 18)
+              .toFloatApproximation()
+              .toFixed(2),
           });
         });
 
         newArr
-          .sort((a: any, b: any) => {
+          .sort((a, b) => {
             return b.tokensAmount - a.tokensAmount;
           })
-          .map((item: any, idx: any) => {
+          .map((item, idx) => {
             const rank = idx + 1;
-            setTableRows((current: any) => [
+            setTableRows((current) => [
               ...current,
               createData(rank, item.avatar, item.moniker, item.operatorAddress, item.tokensAmount),
             ]);
@@ -132,34 +147,32 @@ export function LeaderboardTableWithMoniker() {
                 <TableCell>Rank</TableCell>
                 <TableCell>Moniker</TableCell>
                 <TableCell>Address</TableCell>
-                <TableCell align="right">Tokens amount</TableCell>
+                <TableCell>Tokens amount</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {tableRows
                 .filter(
-                  (item: any) =>
-                    item.moniker.includes(validatorAddress) || item.operatorAddress.includes(validatorAddress)
+                  (item) => item.moniker.includes(validatorAddress) || item.operatorAddress.includes(validatorAddress)
                 )
-                .map((row: any) => (
-                  <TableRow key={row.moniker} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                    <TableCell>#{row.rank}</TableCell>
-                    <TableCell component="th" scope="row">
-                      <Link href={`https://uptick.explorers.guru/validator/${row.operatorAddress}`} underline="hover">
-                        <Box component="div" sx={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                          <Avatar sx={{ width: 28, height: 28 }} src={row.avatar} /> {row.moniker}
-                        </Box>
-                      </Link>
-                    </TableCell>
-                    <TableCell component="th" scope="row" align="left">
-                      {row.operatorAddress}
-                    </TableCell>
-                    <TableCell align="right">
-                      {BigInt(row.tokensAmount).toLocaleString()} auptick
-                      {/* {row.tokensAmount.toString().substring(0, row.tokensAmount.toString().indexOf('.') + 7)} uptick */}
-                    </TableCell>
-                  </TableRow>
-                ))}
+                .map((row) => {
+                  return (
+                    <TableRow key={row.moniker} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                      <TableCell>#{row.rank}</TableCell>
+                      <TableCell component="th" scope="row">
+                        <Link href={`https://uptick.explorers.guru/validator/${row.operatorAddress}`} underline="hover">
+                          <Box component="div" sx={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <Avatar sx={{ width: 28, height: 28 }} src={row.avatar} /> {row.moniker}
+                          </Box>
+                        </Link>
+                      </TableCell>
+                      <TableCell component="th" scope="row" align="left">
+                        {row.operatorAddress}
+                      </TableCell>
+                      <TableCell>{row.tokensAmount} Uptick</TableCell>
+                    </TableRow>
+                  );
+                })}
             </TableBody>
           </Table>
         </TableContainer>
