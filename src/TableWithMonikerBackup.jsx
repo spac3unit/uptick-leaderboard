@@ -15,12 +15,7 @@ import Paper from '@mui/material/Paper';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
-import IconButton from '@mui/material/IconButton';
-import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import '@fontsource/jetbrains-mono';
-import ListItem from '@mui/material/ListItem';
 
 function createData(rank, avatar, moniker, operatorAddress, tokensAmount) {
   return { rank, avatar, moniker, operatorAddress, tokensAmount };
@@ -62,7 +57,6 @@ function scientificToDecimal(num) {
 
 export function LeaderboardTableWithMoniker() {
   const [data, setData] = useState([]);
-  const [tooltipText, setTooltipText] = useState('Click to copy');
   const [totalBalance, setTotalBalance] = useState([]);
   const [tableRows, setTableRows] = useState([]);
   const [delegatorAddress, setDelegatorAddress] = useState('uptick1ncn0k65x3esuzxztzymd0s0kwhun7wxnrcc9mw');
@@ -214,33 +208,20 @@ export function LeaderboardTableWithMoniker() {
                         </Box>
                       </TableCell>
                       <TableCell component="th" scope="row">
-                        <Link
-                          href={`https://uptick.explorers.guru/validator/${row.operatorAddress}`}
-                          underline="hover"
-                          target="_blank"
-                        >
+                        <Link href={`https://uptick.explorers.guru/validator/${row.operatorAddress}`} underline="hover">
                           <Box component="div" sx={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                             <Avatar sx={{ width: 28, height: 28 }} src={row.avatar} /> {row.moniker}
                           </Box>
                         </Link>
                       </TableCell>
                       <TableCell component="th" scope="row" align="left">
-                        <Tooltip title={row.operatorAddress} sx={{ fontSize: '12px' }} placement="top-start" arrow>
-                          <Link
-                            sx={{ '&:hover': { cursor: 'default' } }}
-                            color="inherit"
-                            underline="none"
-                            font="inherit"
-                          >
-                            {truncate(row.operatorAddress, 20, 7, 30)}
-                          </Link>
-                        </Tooltip>
+                        {truncate(row.operatorAddress, 20, 7, 30)}
                       </TableCell>
                       <TableCell align="center">{row.tokensAmount} UPTICK</TableCell>
                       <TableCell align="center">
                         {(totalB &&
                           Decimal.fromAtomics(totalB?.balance?.amount, 18).toFloatApproximation().toFixed(18)) ||
-                          0}
+                          0}{' '}
                         UPTICK
                       </TableCell>
                     </TableRow>
