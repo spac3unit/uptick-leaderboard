@@ -176,7 +176,7 @@ export function LeaderboardTableWithMoniker() {
         />
       </Box>
 
-      {tableRows.length ? (
+      {tableRows.length && totalBalance.length ? (
         <TableContainer component={Paper}>
           <Table aria-label="simple table">
             <TableHead>
