@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { truncate } from './utils';
 import { Decimal } from '@cosmjs/math';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
@@ -57,13 +58,14 @@ function scientificToDecimal(num) {
 
 export function LeaderboardTableWithMoniker() {
   const [data, setData] = useState([]);
+  const [totalBalance, setTotalBalance] = useState([]);
   const [tableRows, setTableRows] = useState([]);
   const [delegatorAddress, setDelegatorAddress] = useState('uptick1ncn0k65x3esuzxztzymd0s0kwhun7wxnrcc9mw');
   const [validatorAddress, setValidatorAddress] = useState('');
 
   // let baseurl = 'https://uptick-leaderboard.duckdns.org';
-  let baseurl = 'https://peer1.testnet.uptick.network:1318';
-
+  // let baseurl = 'https://peer1.testnet.uptick.network:1318';
+  // http://62.141.38.231:1317
   const handleDelegatorAddressChange = (event) => {
     setTableRows([]);
     setDelegatorAddress(event.target.value);
@@ -78,6 +80,7 @@ export function LeaderboardTableWithMoniker() {
       .then((response) => response.json())
       .then((delegationsData) => {
         let newArr = [];
+
         delegationsData.map((item) => {
           newArr.push({
             moniker: item.validator.moniker,
@@ -86,7 +89,10 @@ export function LeaderboardTableWithMoniker() {
             status: item.status,
             tokensAmount: Decimal.fromAtomics(scientificToDecimal(item.tokens.amount).toString(), 18)
               .toFloatApproximation()
-              .toFixed(2),
+              .toFixed(0),
+            // totalBalance: totalDelegationsArr.find(
+            //   ({ validator_address }) => validator_address == item.validator.operatorAddress
+            // ),
           });
         });
 
@@ -102,16 +108,52 @@ export function LeaderboardTableWithMoniker() {
             ]);
           });
 
-        console.log(newArr);
+        // console.log(newArr);
       });
-  }, []);
+  }, [delegatorAddress]);
+
+  useEffect(() => {
+    let totalDelegationsArr = [];
+    fetch(
+      'http://62.141.38.231:1317/cosmos/staking/v1beta1/delegations/uptick1ncn0k65x3esuzxztzymd0s0kwhun7wxnrcc9mw?pagination.limit=250'
+    )
+      .then((response) => response.json())
+      .then((delegationsData) => {
+        setTotalBalance(delegationsData.delegation_responses);
+        // console.log('totalBalance', totalBalance);
+      });
+
+    // fetch('http://62.141.38.231:1317/cosmos/staking/v1beta1/delegations/uptick1ncn0k65x3esuzxztzymd0s0kwhun7wxnrcc9mw')
+    //   .then((response) => response.json())
+    //   .then((delegationsData) => {
+    //     delegationsData.delegation_responses.map((item) => {
+    //       totalDelegationsArr.push({
+    //         totalBalance: item.balance.amount,
+    //         validator_address: item.delegation.validator_address,
+    //       });
+    //     });
+    //   });
+    // console.log(totalDelegationsArr);
+    // setTotalBalance(totalDelegationsArr);
+    // console.log('totalBalance', totalBalance);
+  }, [delegatorAddress]);
+
+  const MEDALS = ['🥇', '🥈', '🥉'];
 
   return (
-    <Container sx={{ maxWidth: '1240px !important' }}>
-      <Typography variant="h4" align="center" sx={{ m: '18px 0 38px 0' }}>
+    <Container sx={{ maxWidth: '1300px !important' }}>
+      <Typography
+        variant="h4"
+        align="center"
+        sx={{
+          m: '18px 0 48px 0',
+          '&:hover': {
+            filter: 'drop-shadow(0 0 24px #646cffd9)',
+          },
+        }}
+      >
         🏆 Game of Uptick Testnet Leaderboard 🏆
       </Typography>
-
       <Box
         component="div"
         sx={{
@@ -130,6 +172,7 @@ export function LeaderboardTableWithMoniker() {
         />
 
         <TextField
+          disabled
           value={delegatorAddress}
           onChange={handleDelegatorAddressChange}
           label="Delegator address"
@@ -138,8 +181,7 @@ export function LeaderboardTableWithMoniker() {
           spellCheck={false}
         />
       </Box>
-
-      {tableRows && (
+      {tableRows && totalBalance && (
         <TableContainer component={Paper}>
           <Table aria-label="simple table">
             <TableHead>
@@ -147,7 +189,8 @@ export function LeaderboardTableWithMoniker() {
                 <TableCell>Rank</TableCell>
                 <TableCell>Moniker</TableCell>
                 <TableCell>Address</TableCell>
-                <TableCell>Tokens amount</TableCell>
+                <TableCell align="center">Official delegated</TableCell>
+                <TableCell align="center">Total delegated</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -156,9 +199,19 @@ export function LeaderboardTableWithMoniker() {
                   (item) => item.moniker.includes(validatorAddress) || item.operatorAddress.includes(validatorAddress)
                 )
                 .map((row) => {
+                  const totalB = totalBalance.find(
+                    ({ delegation }) => delegation.validator_address == row.operatorAddress
+                  );
+
+                  const medal =
+                    row.rank == 1 ? MEDALS[0] : row.rank == 2 ? MEDALS[1] : row.rank == 3 ? MEDALS[2] : null;
                   return (
                     <TableRow key={row.moniker} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                      <TableCell>#{row.rank}</TableCell>
+                      <TableCell>
+                        <Box component="div" sx={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <div style={{ fontSize: medal ? '22px' : '' }}>{medal || `#${row.rank}`}</div>
+                        </Box>
+                      </TableCell>
                       <TableCell component="th" scope="row">
                         <Link href={`https://uptick.explorers.guru/validator/${row.operatorAddress}`} underline="hover">
                           <Box component="div" sx={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -167,9 +220,15 @@ export function LeaderboardTableWithMoniker() {
                         </Link>
                       </TableCell>
                       <TableCell component="th" scope="row" align="left">
-                        {row.operatorAddress}
+                        {truncate(row.operatorAddress, 20, 7, 30)}
                       </TableCell>
-                      <TableCell>{row.tokensAmount} Uptick</TableCell>
+                      <TableCell align="center">{row.tokensAmount} UPTICK</TableCell>
+                      <TableCell align="center">
+                        {(totalB &&
+                          Decimal.fromAtomics(totalB?.balance?.amount, 18).toFloatApproximation().toFixed(18)) ||
+                          0}{' '}
+                        UPTICK
+                      </TableCell>
                     </TableRow>
                   );
                 })}
