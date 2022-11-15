@@ -54,7 +54,6 @@ function scientificToDecimal(num) {
 
   return nsign < 0 ? '-' + num : num;
 }
-// let baseurl = 'http://62.141.38.231:1317';
 
 export function LeaderboardTableWithMoniker() {
   const [data, setData] = useState([]);
@@ -90,9 +89,6 @@ export function LeaderboardTableWithMoniker() {
             tokensAmount: Decimal.fromAtomics(scientificToDecimal(item.tokens.amount).toString(), 18)
               .toFloatApproximation()
               .toFixed(0),
-            // totalBalance: totalDelegationsArr.find(
-            //   ({ validator_address }) => validator_address == item.validator.operatorAddress
-            // ),
           });
         });
 
@@ -113,14 +109,12 @@ export function LeaderboardTableWithMoniker() {
   }, [delegatorAddress]);
 
   useEffect(() => {
-    let totalDelegationsArr = [];
     fetch(
-      'http://62.141.38.231:1317/cosmos/staking/v1beta1/delegations/uptick1ncn0k65x3esuzxztzymd0s0kwhun7wxnrcc9mw?pagination.limit=250'
+      'https://uptick-leaderboard.duckdns.org/cosmos/staking/v1beta1/delegations/uptick1ncn0k65x3esuzxztzymd0s0kwhun7wxnrcc9mw?pagination.limit=250'
     )
       .then((response) => response.json())
       .then((delegationsData) => {
         setTotalBalance(delegationsData.delegation_responses);
-        // console.log('totalBalance', totalBalance);
       });
 
     // fetch('http://62.141.38.231:1317/cosmos/staking/v1beta1/delegations/uptick1ncn0k65x3esuzxztzymd0s0kwhun7wxnrcc9mw')
