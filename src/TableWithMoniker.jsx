@@ -4,7 +4,7 @@ import { Decimal } from '@cosmjs/math';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
-
+import Skeleton from '@mui/material/Skeleton';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -175,7 +175,8 @@ export function LeaderboardTableWithMoniker() {
           spellCheck={false}
         />
       </Box>
-      {tableRows && totalBalance && (
+
+      {tableRows.length ? (
         <TableContainer component={Paper}>
           <Table aria-label="simple table">
             <TableHead>
@@ -229,6 +230,20 @@ export function LeaderboardTableWithMoniker() {
             </TableBody>
           </Table>
         </TableContainer>
+      ) : (
+        <Box>
+          Loading...
+          <Skeleton animation="wave" height={64} />
+          <Skeleton animation="wave" height={64} />
+          <Skeleton animation="wave" height={64} />
+          <Skeleton animation="wave" height={64} />
+          <Skeleton animation="wave" height={64} />
+          <Skeleton animation="wave" height={64} />
+          <Skeleton animation="wave" height={64} />
+          <Skeleton animation="wave" height={64} />
+          <Skeleton animation="wave" height={64} />
+          <Skeleton animation="wave" height={64} />
+        </Box>
       )}
     </Container>
   );
