@@ -62,8 +62,7 @@ function scientificToDecimal(num) {
 
 export function LeaderboardTableWithMoniker() {
   const [data, setData] = useState([]);
-  const [tooltipText, setTooltipText] = useState('Click to copy');
-  const [totalBalance, setTotalBalance] = useState([]);
+  const [validators, setValidators] = useState([]);
   const [tableRows, setTableRows] = useState([]);
   const [delegatorAddress, setDelegatorAddress] = useState('uptick1ncn0k65x3esuzxztzymd0s0kwhun7wxnrcc9mw');
   const [validatorAddress, setValidatorAddress] = useState('');
@@ -114,28 +113,36 @@ export function LeaderboardTableWithMoniker() {
       });
   }, [delegatorAddress]);
 
-  useEffect(() => {
-    fetch(
-      'https://uptick-leaderboard.duckdns.org/cosmos/staking/v1beta1/delegations/uptick1ncn0k65x3esuzxztzymd0s0kwhun7wxnrcc9mw?pagination.limit=250'
-    )
-      .then((response) => response.json())
-      .then((delegationsData) => {
-        setTotalBalance(delegationsData.delegation_responses);
-      });
+  // useEffect(() => {
+  //   fetch(
+  //     'https://uptick-leaderboard.duckdns.org/cosmos/staking/v1beta1/delegations/uptick1ncn0k65x3esuzxztzymd0s0kwhun7wxnrcc9mw?pagination.limit=250'
+  //   )
+  //     .then((response) => response.json())
+  //     .then((delegationsData) => {
+  //       setTotalBalance(delegationsData.delegation_responses);
+  //     });
 
-    // fetch('http://62.141.38.231:1317/cosmos/staking/v1beta1/delegations/uptick1ncn0k65x3esuzxztzymd0s0kwhun7wxnrcc9mw')
-    //   .then((response) => response.json())
-    //   .then((delegationsData) => {
-    //     delegationsData.delegation_responses.map((item) => {
-    //       totalDelegationsArr.push({
-    //         totalBalance: item.balance.amount,
-    //         validator_address: item.delegation.validator_address,
-    //       });
-    //     });
-    //   });
-    // console.log(totalDelegationsArr);
-    // setTotalBalance(totalDelegationsArr);
-    // console.log('totalBalance', totalBalance);
+  //   // fetch('http://62.141.38.231:1317/cosmos/staking/v1beta1/delegations/uptick1ncn0k65x3esuzxztzymd0s0kwhun7wxnrcc9mw')
+  //   //   .then((response) => response.json())
+  //   //   .then((delegationsData) => {
+  //   //     delegationsData.delegation_responses.map((item) => {
+  //   //       totalDelegationsArr.push({
+  //   //         totalBalance: item.balance.amount,
+  //   //         validator_address: item.delegation.validator_address,
+  //   //       });
+  //   //     });
+  //   //   });
+  //   // console.log(totalDelegationsArr);
+  //   // setTotalBalance(totalDelegationsArr);
+  //   // console.log('totalBalance', totalBalance);
+  // }, [delegatorAddress]);
+
+  useEffect(() => {
+    fetch('https://uptick.api.explorers.guru/api/v1/validators')
+      .then((response) => response.json())
+      .then((validatorsData) => {
+        setValidators(validatorsData);
+      });
   }, [delegatorAddress]);
 
   const MEDALS = ['🥇', '🥈', '🥉'];
@@ -172,7 +179,6 @@ export function LeaderboardTableWithMoniker() {
         />
 
         <TextField
-          disabled
           value={delegatorAddress}
           onChange={handleDelegatorAddressChange}
           label="Delegator address"
@@ -182,7 +188,7 @@ export function LeaderboardTableWithMoniker() {
         />
       </Box>
 
-      {tableRows.length && totalBalance.length ? (
+      {tableRows.length && validators.length ? (
         <TableContainer component={Paper}>
           <Table aria-label="simple table">
             <TableHead>
@@ -200,9 +206,7 @@ export function LeaderboardTableWithMoniker() {
                   (item) => item.moniker.includes(validatorAddress) || item.operatorAddress.includes(validatorAddress)
                 )
                 .map((row) => {
-                  const totalB = totalBalance.find(
-                    ({ delegation }) => delegation.validator_address == row.operatorAddress
-                  );
+                  const validatorWithTotal = validators.find((v) => v.operatorAddress == row.operatorAddress);
 
                   const medal =
                     row.rank == 1 ? MEDALS[0] : row.rank == 2 ? MEDALS[1] : row.rank == 3 ? MEDALS[2] : null;
@@ -238,9 +242,9 @@ export function LeaderboardTableWithMoniker() {
                       </TableCell>
                       <TableCell align="center">{row.tokensAmount} UPTICK</TableCell>
                       <TableCell align="center">
-                        {(totalB &&
-                          Decimal.fromAtomics(totalB?.balance?.amount, 18).toFloatApproximation().toFixed(18)) ||
-                          0}
+                        {Decimal.fromAtomics(scientificToDecimal(validatorWithTotal?.tokens).toString(), 18)
+                          .toFloatApproximation()
+                          .toFixed(0) || 0}{' '}
                         UPTICK
                       </TableCell>
                     </TableRow>
