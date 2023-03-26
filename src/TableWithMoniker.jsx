@@ -26,6 +26,13 @@ function createData(rank, avatar, moniker, operatorAddress, tokensAmount) {
   return { rank, avatar, moniker, operatorAddress, tokensAmount };
 }
 
+export const isBech32 = (address, network) => {
+  const regexpString = `^(${network}valoper|[13])[a-zA-HJ-NP-Z0-9]{25,39}$`;
+  const regexp = new RegExp(regexpString, 'gi');
+  // const regexExp = /^(archwayvaloper|[13])[a-zA-HJ-NP-Z0-9]{25,39}$/gi;
+  return regexp.test(address);
+};
+
 function scientificToDecimal(num) {
   var nsign = Math.sign(num);
   //remove the sign
@@ -80,7 +87,7 @@ export function LeaderboardTableWithMoniker() {
   };
 
   useEffect(() => {
-    fetch(`https://uptick.api.explorers.guru/api/v1/accounts/${delegatorAddress}/delegations`)
+    fetch(`https://testnet.uptick.api.explorers.guru/api/v1/accounts/${delegatorAddress}/delegations`)
       .then((response) => response.json())
       .then((delegationsData) => {
         let newArr = [];
@@ -138,7 +145,7 @@ export function LeaderboardTableWithMoniker() {
   // }, [delegatorAddress]);
 
   useEffect(() => {
-    fetch('https://uptick.api.explorers.guru/api/v1/validators')
+    fetch('https://testnet.uptick.api.explorers.guru/api/v1/validators')
       .then((response) => response.json())
       .then((validatorsData) => {
         setValidators(validatorsData);
@@ -219,7 +226,7 @@ export function LeaderboardTableWithMoniker() {
                       </TableCell>
                       <TableCell component="th" scope="row">
                         <Link
-                          href={`https://uptick.explorers.guru/validator/${row.operatorAddress}`}
+                          href={`https://testnet.uptick.explorers.guru/validator/${row.operatorAddress}`}
                           underline="hover"
                           target="_blank"
                         >
